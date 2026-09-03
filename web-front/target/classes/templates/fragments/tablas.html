@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Tabla estandar de resultados de busqueda: nombre, apellidos, DNI,
+  direccion completa del inmueble y renta. La usan la pantalla de busqueda
+  (funcionalidad 2) y la de alta de renta (funcionalidad 4).
+-->
+<div th:fragment="resultados(filas)" class="tabla-scroll">
+    <table>
+        <thead>
+        <tr>
+            <th>Nombre</th><th>Apellidos</th><th>DNI</th>
+            <th>Direccion del inmueble</th>
+            <th class="importe">Renta</th>
+            <th>Desde</th><th>Hasta</th><th>Situacion</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="f : ${filas}">
+            <td th:text="${f.nombre()}"></td>
+            <td th:text="${f.apellidos()}"></td>
+            <td th:text="${f.dni()}"></td>
+            <td th:text="${f.direccionCompleta()}"></td>
+            <td class="importe" th:text="${#numbers.formatDecimal(f.renta(), 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+            <td th:text="${f.fechaInicio() != null ? #temporals.format(f.fechaInicio(), 'dd/MM/yyyy') : ''}"></td>
+            <td th:text="${f.fechaFin() != null ? #temporals.format(f.fechaFin(), 'dd/MM/yyyy') : ''}"></td>
+            <td>
+                <span th:if="${f.actual()}" class="etiqueta actual">Actual</span>
+                <span th:unless="${f.actual()}" class="etiqueta anterior">Anterior</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Acceso')}"></head>
+<body>
+<div class="panel-login">
+    <h1>Gestion de alquileres</h1>
+
+    <div class="aviso error" th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="aviso info"  th:if="${mensajeInfo}"  th:text="${mensajeInfo}"></div>
+
+    <form th:action="@{/login}" method="post">
+        <label for="username">Usuario</label>
+        <input type="text" id="username" name="username" autofocus required autocomplete="username">
+
+        <label for="password">Contrasena</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <div class="pie">
+        Si su contrasena ha caducado recibira un aviso en el correo asociado a su usuario.
+    </div>
+</div>
+</body>
+</html>

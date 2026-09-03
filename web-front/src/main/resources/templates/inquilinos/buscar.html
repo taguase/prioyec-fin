@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Buscar inquilinos')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Funcionalidad 2 &middot; Busqueda de inquilinos</h1>
+    <p class="ayuda">Elija si desea buscar por domicilio o por inquilino.</p>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <form th:action="@{/inquilinos/buscar}" method="get" id="formBusqueda">
+            <div class="opciones">
+                <label>
+                    <input type="radio" name="modo" value="DOMICILIO" th:checked="${modo != 'INQUILINO'}"
+                           onchange="this.form.submit()"> Buscar por domicilio
+                </label>
+                <label>
+                    <input type="radio" name="modo" value="INQUILINO" th:checked="${modo == 'INQUILINO'}"
+                           onchange="this.form.submit()"> Buscar por inquilino
+                </label>
+            </div>
+
+            <!-- ---------------- Busqueda por domicilio ---------------- -->
+            <div th:if="${modo != 'INQUILINO'}" class="campos">
+                <div>
+                    <label for="edificio">Direccion del inmueble</label>
+                    <select id="edificio" name="edificio" onchange="cargarViviendas(this.value)">
+                        <option value="">-- seleccione una direccion --</option>
+                        <option th:each="e : ${edificios}"
+                                th:value="${e.clave()}"
+                                th:text="${e.descripcion()}"
+                                th:selected="${e.clave() == edificioSeleccionado}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="inmuebleId">Piso y letra</label>
+                    <select id="inmuebleId" name="inmuebleId">
+                        <option value="">-- seleccione piso y letra --</option>
+                        <option th:each="v : ${viviendas}"
+                                th:value="${v.id}"
+                                th:text="${(#strings.isEmpty(v.piso) ? '-' : v.piso) + ' ' + v.letra}"
+                                th:selected="${v.id == inmuebleId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Buscar</button>
+            </div>
+
+            <!-- ---------------- Busqueda por inquilino ---------------- -->
+            <div th:if="${modo == 'INQUILINO'}" class="campos">
+                <div>
+                    <label for="texto">Nombre, apellidos o DNI</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}"
+                           placeholder="Busqueda parcial (LIKE)">
+                </div>
+                <button type="submit">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ------------------- Resultados por domicilio ------------------- -->
+    <div class="tarjeta" th:if="${modo != 'INQUILINO' and inquilinoActual != null}">
+        <h2>Inquilino actual</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Nombre</th><th>Apellidos</th><th>DNI</th><th>Direccion del inmueble</th><th class="importe">Renta</th></tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="${inquilinoActual.nombre()}"></td>
+                    <td th:text="${inquilinoActual.apellidos()}"></td>
+                    <td th:text="${inquilinoActual.dni()}"></td>
+                    <td th:text="${inquilinoActual.direccionCompleta()}"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(inquilinoActual.renta(), 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="acciones">
+            <a class="boton" th:href="@{/inquilinos/buscar(modo='DOMICILIO', edificio=${edificioSeleccionado}, inmuebleId=${inmuebleId}, verHistorico=true)}">
+                Ver historico completo
+            </a>
+            <a class="boton secundario" th:href="@{/inquilinos/buscar(modo='DOMICILIO', edificio=${edificioSeleccionado}, inmuebleId=${inmuebleId}, verAnteriores=true)}">
+                Ver inquilinos anteriores
+            </a>
+        </div>
+    </div>
+
+    <div class="tarjeta" th:if="${historico != null}">
+        <h2>Historico de la vivienda (todos los inquilinos)</h2>
+        <div th:replace="~{fragments/tablas :: resultados(${historico})}"></div>
+    </div>
+
+    <div class="tarjeta" th:if="${anteriores != null}">
+        <h2>Inquilinos anteriores</h2>
+        <div th:replace="~{fragments/tablas :: resultados(${anteriores})}"></div>
+    </div>
+
+    <!-- ------------------- Resultados por inquilino ------------------- -->
+    <div class="tarjeta" th:if="${modo == 'INQUILINO' and resultados != null and !resultados.isEmpty()}">
+        <h2>Resultados</h2>
+        <div th:replace="~{fragments/tablas :: resultados(${resultados})}"></div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    /* Combo dependiente: al cambiar de portal se recargan las viviendas. */
+    const URL_VIVIENDAS = /*[[@{/inquilinos/viviendas}]]*/ '/inquilinos/viviendas';
+
+    function cargarViviendas(clave) {
+        const combo = document.getElementById('inmuebleId');
+        combo.innerHTML = '<option value="">-- seleccione piso y letra --</option>';
+        if (!clave) return;
+        fetch(URL_VIVIENDAS + '?edificio=' + encodeURIComponent(clave))
+            .then(r => r.json())
+            .then(lista => lista.forEach(v => {
+                const o = document.createElement('option');
+                o.value = v.id;
+                o.textContent = v.descripcion;
+                combo.appendChild(o);
+            }))
+            .catch(() => { /* si falla, el usuario puede pulsar Buscar y recargar por servidor */ });
+    }
+</script>
+</body>
+</html>

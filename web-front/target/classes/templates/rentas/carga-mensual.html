@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Fichero del mes')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Funcionalidad 3 &middot; Carga del fichero del mes</h1>
+    <p class="ayuda">
+        La columna B contiene el concepto donde se busca el nombre del inquilino, la C el importe y la D la fecha.
+        Si un inquilino aparece en varios movimientos, los importes se suman y las fechas se concatenan.
+    </p>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <form th:action="@{/rentas/carga-mensual}" method="post" enctype="multipart/form-data">
+            <div class="campos">
+                <div>
+                    <label for="fichero">Fichero de cobros del mes</label>
+                    <input type="file" id="fichero" name="fichero" accept=".xlsx,.xls" required>
+                </div>
+                <div>
+                    <label for="anio">Anio de imputacion</label>
+                    <input type="number" id="anio" name="anio" th:value="${anio}" min="2000" max="2100">
+                </div>
+                <div>
+                    <label for="mes">Mes de imputacion</label>
+                    <input type="number" id="mes" name="mes" th:value="${mes}" min="1" max="12">
+                </div>
+                <button type="submit">Procesar</button>
+                <a class="boton secundario" th:href="@{/rentas/plantilla-mensual}">Descargar plantilla</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="tarjeta" th:if="${resultado}">
+        <h2>Resultado de la conciliacion</h2>
+        <div class="metricas">
+            <div class="metrica"><div class="titulo">Movimientos leidos</div><div class="valor" th:text="${resultado.movimientosLeidos}">0</div></div>
+            <div class="metrica"><div class="titulo">Contratos con cobro</div><div class="valor" th:text="${resultado.contratosConCobro}">0</div></div>
+            <div class="metrica"><div class="titulo">Contratos sin cobro</div><div class="valor" th:text="${resultado.contratosSinCobro}">0</div></div>
+            <div class="metrica"><div class="titulo">Sin casar</div><div class="valor" th:text="${resultado.noEncontrados.size()}">0</div></div>
+        </div>
+
+        <div class="acciones">
+            <a class="boton" th:href="@{/rentas/carga-mensual/descargar}">Descargar Excel de resultados</a>
+        </div>
+
+        <h2>Listado de inmuebles e inquilinos</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Direccion del inmueble</th><th>Nombre</th><th>Apellidos</th><th>DNI</th>
+                    <th class="importe">Renta contrato</th>
+                    <th class="importe">Importe encontrado</th>
+                    <th>Fecha(s)</th>
+                    <th class="importe">Movs.</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="l : ${resultado.lineas}">
+                    <td th:text="${l.direccionCompleta}"></td>
+                    <td th:text="${l.nombre}"></td>
+                    <td th:text="${l.apellidos}"></td>
+                    <td th:text="${l.dni}"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(l.rentaContrato, 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(l.importeEncontrado, 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td th:text="${l.fechas}"></td>
+                    <td class="importe" th:text="${l.numMovimientos}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 th:if="${!resultado.noEncontrados.isEmpty()}">Movimientos no localizados</h2>
+        <div class="tabla-scroll" th:if="${!resultado.noEncontrados.isEmpty()}">
+            <table>
+                <thead>
+                <tr><th>Fila</th><th>Concepto</th><th class="importe">Importe</th><th>Fecha</th><th>Motivo</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${resultado.noEncontrados}">
+                    <td th:text="${m.fila}"></td>
+                    <td th:text="${m.concepto}"></td>
+                    <td class="importe" th:text="${m.importe != null ? #numbers.formatDecimal(m.importe, 1, 'POINT', 2, 'COMMA') + ' €' : ''}"></td>
+                    <td th:text="${m.fecha != null ? #temporals.format(m.fecha, 'dd/MM/yyyy') : ''}"></td>
+                    <td th:text="${m.motivo}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

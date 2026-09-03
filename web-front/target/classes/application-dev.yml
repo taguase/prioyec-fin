@@ -1,0 +1,13 @@
+# Perfil de desarrollo: recarga de plantillas, log SQL y correo simulado.
+spring:
+  thymeleaf:
+    cache: false
+  jpa:
+    show-sql: true
+logging:
+  level:
+    com.gestion.alquileres: DEBUG
+app:
+  correo:
+    # Los avisos se escriben en el log en lugar de enviarse por SMTP.
+    habilitado: false

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Usuarios')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Usuarios</h1>
+    <p class="ayuda">La cuenta <strong>system</strong> esta marcada como "no caduca nunca" y se regenera en cada arranque.</p>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Usuario</th><th>Nombre</th><th>Correo de avisos</th><th>Rol</th>
+                    <th>Activo</th><th>Caduca</th><th>Estado</th><th>Ultimo aviso</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.nombreCompleto}"></td>
+                    <td th:text="${u.email}"></td>
+                    <td th:text="${u.rol}"></td>
+                    <td th:text="${u.activo} ? 'Si' : 'No'"></td>
+                    <td th:text="${u.passwordNuncaCaduca} ? 'Nunca' :
+                                 (${u.fechaCaducidadPassword} != null ? ${#temporals.format(u.fechaCaducidadPassword, 'dd/MM/yyyy')} : '-')"></td>
+                    <td>
+                        <span th:if="${u.passwordCaducada}" class="etiqueta anterior" style="color:#b3261e">Caducada</span>
+                        <span th:unless="${u.passwordCaducada}" class="etiqueta actual">Vigente</span>
+                    </td>
+                    <td th:text="${u.fechaUltimoAviso} != null ? ${#temporals.format(u.fechaUltimoAviso, 'dd/MM/yyyy HH:mm')} : '-'"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tarjeta">
+        <h2>Alta de usuario</h2>
+        <form th:action="@{/admin/usuarios/alta}" method="post">
+            <div class="campos">
+                <div><label for="username">Usuario</label><input type="text" id="username" name="username" required></div>
+                <div><label for="password">Contrasena</label><input type="password" id="password" name="password" required></div>
+                <div><label for="email">Correo de avisos</label><input type="text" id="email" name="email" required></div>
+                <div><label for="nombreCompleto">Nombre completo</label><input type="text" id="nombreCompleto" name="nombreCompleto"></div>
+                <div>
+                    <label for="rol">Rol</label>
+                    <select id="rol" name="rol">
+                        <option value="ROLE_USER">ROLE_USER</option>
+                        <option value="ROLE_ADMIN">ROLE_ADMIN</option>
+                    </select>
+                </div>
+                <button type="submit">Crear</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tarjeta">
+        <h2>Cambiar contrasena</h2>
+        <p class="ayuda">Reinicia la fecha de caducidad segun los dias de validez configurados.</p>
+        <form th:action="@{/admin/usuarios/password}" method="post">
+            <div class="campos">
+                <div>
+                    <label for="usernameCambio">Usuario</label>
+                    <select id="usernameCambio" name="username">
+                        <option th:each="u : ${usuarios}" th:value="${u.username}" th:text="${u.username}"></option>
+                    </select>
+                </div>
+                <div><label for="passwordNueva">Nueva contrasena</label><input type="password" id="passwordNueva" name="password" required></div>
+                <button type="submit">Actualizar</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

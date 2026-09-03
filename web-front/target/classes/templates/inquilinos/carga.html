@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Carga de inquilinos')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Funcionalidad 1 &middot; Carga de inquilinos</h1>
+    <p class="ayuda">Fichero Excel (.xlsx o .xls). La primera fila es la cabecera y se ignora.</p>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <form th:action="@{/inquilinos/carga}" method="post" enctype="multipart/form-data">
+            <div class="campos">
+                <div>
+                    <label for="fichero">Fichero de inquilinos</label>
+                    <input type="file" id="fichero" name="fichero" accept=".xlsx,.xls" required>
+                </div>
+                <button type="submit">Cargar</button>
+                <a class="boton secundario" th:href="@{/inquilinos/plantilla}">Descargar plantilla</a>
+            </div>
+        </form>
+
+        <h2>Columnas esperadas</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th th:each="c,it : ${cabeceras}"
+                        th:text="${#strings.substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ', it.index, it.index + 1)} + ' - ' + ${c}"></th></tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <div class="tarjeta" th:if="${resultado}">
+        <h2>Resultado de la carga</h2>
+        <div class="metricas">
+            <div class="metrica"><div class="titulo">Filas leidas</div><div class="valor" th:text="${resultado.leidos}">0</div></div>
+            <div class="metrica"><div class="titulo">Correctas</div><div class="valor" th:text="${resultado.correctos}">0</div></div>
+            <div class="metrica"><div class="titulo">Con error</div><div class="valor" th:text="${resultado.erroneos}">0</div></div>
+            <div class="metrica"><div class="titulo">Inmuebles nuevos</div><div class="valor" th:text="${resultado.inmueblesNuevos}">0</div></div>
+            <div class="metrica"><div class="titulo">Inquilinos nuevos</div><div class="valor" th:text="${resultado.inquilinosNuevos}">0</div></div>
+            <div class="metrica"><div class="titulo">Contratos nuevos</div><div class="valor" th:text="${resultado.contratosNuevos}">0</div></div>
+            <div class="metrica"><div class="titulo">Contratos actualizados</div><div class="valor" th:text="${resultado.contratosActualizados}">0</div></div>
+        </div>
+
+        <div th:if="${!resultado.incidencias.isEmpty()}">
+            <h2>Incidencias</h2>
+            <ul class="incidencias">
+                <li th:each="i : ${resultado.incidencias}" th:text="${i}"></li>
+            </ul>
+        </div>
+    </div>
+</main>
+</body>
+</html>

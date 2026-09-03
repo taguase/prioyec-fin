@@ -1,0 +1,9 @@
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/Application.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/config/SecurityConfig.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/AdminUsuariosController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/BusquedaController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/CargaInquilinosController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/ConciliacionController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/InformesController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/LoginController.java
+/Users/taguase/gestion-alquileres/web-front/src/main/java/com/gestion/alquileres/web/controller/RentaController.java

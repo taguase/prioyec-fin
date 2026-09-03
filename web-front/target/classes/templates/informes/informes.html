@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Informes')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Funcionalidades 5 y 6 &middot; Informes en Excel</h1>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <h2>Funcionalidad 5 &middot; Excel mensual</h2>
+        <p class="ayuda">Direccion del inmueble, inquilino, importe de la renta del mes y fecha en la que se hizo.</p>
+        <form th:action="@{/informes/mensual}" method="get">
+            <div class="campos">
+                <div>
+                    <label for="anioMensual">Anio</label>
+                    <input type="number" id="anioMensual" name="anio" th:value="${anio}" min="2000" max="2100" required>
+                </div>
+                <div>
+                    <label for="mesMensual">Mes</label>
+                    <input type="number" id="mesMensual" name="mes" th:value="${mes}" min="1" max="12" required>
+                </div>
+                <button type="submit">Descargar Excel mensual</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tarjeta">
+        <h2>Funcionalidad 6 &middot; Excel anual</h2>
+        <p class="ayuda">Por inmueble: direccion, listado de inquilinos (nombre y DNI) y los importes de los doce meses.</p>
+        <form th:action="@{/informes/anual}" method="get">
+            <div class="campos">
+                <div>
+                    <label for="anioAnual">Anio</label>
+                    <input type="number" id="anioAnual" name="anio" th:value="${anio}" min="2000" max="2100" required>
+                </div>
+                <button type="submit">Descargar Excel anual</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tarjeta" th:if="${previoMensual != null and !previoMensual.isEmpty()}">
+        <h2>Vista previa del mes en curso</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Direccion del inmueble</th><th>Inquilino</th><th>DNI</th>
+                    <th class="importe">Renta contrato</th><th class="importe">Importe del mes</th>
+                    <th>Fecha(s)</th><th>Origen</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="f : ${previoMensual}">
+                    <td th:text="${f.direccionCompleta()}"></td>
+                    <td th:text="${f.inquilino()}"></td>
+                    <td th:text="${f.dni()}"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(f.rentaContrato(), 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(f.importeCobrado(), 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td th:text="${f.fechas()}"></td>
+                    <td th:text="${f.origen()}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

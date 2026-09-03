@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Insertar renta del mes')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Funcionalidad 4 &middot; Insertar la renta del mes</h1>
+    <p class="ayuda">Localice el contrato igual que en la busqueda de inquilinos e introduzca importe y fecha.
+        El periodo (mes y anio) se deduce de la fecha indicada.</p>
+
+    <div th:replace="~{fragments/layout :: avisos}"></div>
+
+    <div class="tarjeta">
+        <form th:action="@{/rentas/alta}" method="get">
+            <div class="opciones">
+                <label><input type="radio" name="modo" value="DOMICILIO" th:checked="${modo != 'INQUILINO'}"
+                              onchange="this.form.submit()"> Buscar por domicilio</label>
+                <label><input type="radio" name="modo" value="INQUILINO" th:checked="${modo == 'INQUILINO'}"
+                              onchange="this.form.submit()"> Buscar por inquilino</label>
+            </div>
+
+            <div th:if="${modo != 'INQUILINO'}" class="campos">
+                <div>
+                    <label for="edificio">Direccion del inmueble</label>
+                    <select id="edificio" name="edificio" onchange="cargarViviendas(this.value)">
+                        <option value="">-- seleccione una direccion --</option>
+                        <option th:each="e : ${edificios}" th:value="${e.clave()}" th:text="${e.descripcion()}"
+                                th:selected="${e.clave() == edificioSeleccionado}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="inmuebleId">Piso y letra</label>
+                    <select id="inmuebleId" name="inmuebleId">
+                        <option value="">-- seleccione piso y letra --</option>
+                        <option th:each="v : ${viviendas}" th:value="${v.id}"
+                                th:text="${(#strings.isEmpty(v.piso) ? '-' : v.piso) + ' ' + v.letra}"
+                                th:selected="${v.id == inmuebleId}"></option>
+                    </select>
+                </div>
+                <button type="submit">Buscar</button>
+            </div>
+
+            <div th:if="${modo == 'INQUILINO'}" class="campos">
+                <div>
+                    <label for="texto">Nombre, apellidos o DNI</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}">
+                </div>
+                <button type="submit">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="tarjeta" th:if="${resultados != null and !resultados.isEmpty()}">
+        <h2>Contratos encontrados</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th><th>Apellidos</th><th>DNI</th><th>Direccion del inmueble</th>
+                    <th class="importe">Renta</th>
+                    <th class="importe">Importe a registrar</th>
+                    <th>Fecha</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="f : ${resultados}">
+                    <td th:text="${f.nombre()}"></td>
+                    <td th:text="${f.apellidos()}"></td>
+                    <td th:text="${f.dni()}"></td>
+                    <td th:text="${f.direccionCompleta()}"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(f.renta(), 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td class="importe">
+                        <input type="number" step="0.01" name="importe" style="min-width:120px"
+                               th:form="'alta-' + ${f.contratoId()}" th:value="${f.renta()}" required>
+                    </td>
+                    <td>
+                        <input type="date" name="fecha" th:form="'alta-' + ${f.contratoId()}"
+                               th:value="${hoy}" required>
+                    </td>
+                    <td><button type="submit" th:form="'alta-' + ${f.contratoId()}">Guardar</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Un formulario por fila, asociado a sus campos mediante el atributo form= -->
+        <form th:each="f : ${resultados}" th:id="'alta-' + ${f.contratoId()}"
+              th:action="@{/rentas/alta}" method="post" hidden>
+            <input type="hidden" name="contratoId" th:value="${f.contratoId()}">
+            <input type="hidden" name="modo" th:value="${modo}">
+            <input type="hidden" name="edificio" th:value="${edificioSeleccionado}">
+            <input type="hidden" name="inmuebleId" th:value="${inmuebleId}">
+            <input type="hidden" name="texto" th:value="${texto}">
+        </form>
+    </div>
+
+    <div class="tarjeta" th:if="${historicoRentas != null and !historicoRentas.isEmpty()}">
+        <h2>Rentas registradas del contrato</h2>
+        <div class="tabla-scroll">
+            <table>
+                <thead>
+                <tr><th>Anio</th><th>Mes</th><th class="importe">Importe</th><th>Fecha(s)</th><th>Origen</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${historicoRentas}">
+                    <td th:text="${r.anio}"></td>
+                    <td th:text="${r.mes}"></td>
+                    <td class="importe" th:text="${#numbers.formatDecimal(r.importe, 1, 'POINT', 2, 'COMMA')} + ' €'"></td>
+                    <td th:text="${r.fechasPago}"></td>
+                    <td th:text="${r.origen}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    const URL_VIVIENDAS = /*[[@{/inquilinos/viviendas}]]*/ '/inquilinos/viviendas';
+
+    function cargarViviendas(clave) {
+        const combo = document.getElementById('inmuebleId');
+        combo.innerHTML = '<option value="">-- seleccione piso y letra --</option>';
+        if (!clave) return;
+        fetch(URL_VIVIENDAS + '?edificio=' + encodeURIComponent(clave))
+            .then(r => r.json())
+            .then(lista => lista.forEach(v => {
+                const o = document.createElement('option');
+                o.value = v.id;
+                o.textContent = v.descripcion;
+                combo.appendChild(o);
+            }))
+            .catch(() => {});
+    }
+</script>
+</body>
+</html>

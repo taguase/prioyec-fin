@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="cabecera(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="'Gestion de alquileres - ' + ${titulo}">Gestion de alquileres</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<header class="barra" th:fragment="barra">
+    <span class="marca">Gestion de alquileres</span>
+    <nav>
+        <a th:href="@{/inicio}">Inicio</a>
+        <a th:href="@{/inquilinos/carga}">Carga de inquilinos</a>
+        <a th:href="@{/inquilinos/buscar}">Buscar inquilinos</a>
+        <a th:href="@{/rentas/carga-mensual}">Fichero del mes</a>
+        <a th:href="@{/rentas/alta}">Insertar renta</a>
+        <a th:href="@{/informes}">Informes</a>
+        <a th:href="@{/admin/usuarios}" sec:authorize="hasAuthority('ROLE_ADMIN')">Usuarios</a>
+    </nav>
+    <div class="sesion">
+        <span sec:authentication="name">usuario</span>
+        <form th:action="@{/logout}" method="post" style="margin:0">
+            <button type="submit" class="boton secundario" style="padding:4px 10px">Salir</button>
+        </form>
+    </div>
+</header>
+
+<div th:fragment="avisos">
+    <div class="aviso ok"     th:if="${mensajeOk}"    th:text="${mensajeOk}"></div>
+    <div class="aviso error"  th:if="${mensajeError}" th:text="${mensajeError}"></div>
+    <div class="aviso info"   th:if="${mensajeInfo}"  th:text="${mensajeInfo}"></div>
+</div>
+
+</body>
+</html>

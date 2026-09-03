@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: cabecera('Inicio')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: barra}"></header>
+<main>
+    <h1>Panel principal</h1>
+    <p class="ayuda">Seleccione la operacion que desea realizar.</p>
+
+    <div class="tarjetas-inicio">
+        <a th:href="@{/inquilinos/carga}">
+            <div class="tarjeta">
+                <div class="num">Funcionalidad 1</div>
+                <h2 style="margin-top:6px">Carga de inquilinos</h2>
+                <p class="ayuda">Sube el Excel con inquilinos, contratos, direcciones y rentas.</p>
+            </div>
+        </a>
+        <a th:href="@{/inquilinos/buscar}">
+            <div class="tarjeta">
+                <div class="num">Funcionalidad 2</div>
+                <h2 style="margin-top:6px">Buscar inquilinos</h2>
+                <p class="ayuda">Por domicilio (portal y piso/letra) o por nombre y DNI, con historico.</p>
+            </div>
+        </a>
+        <a th:href="@{/rentas/carga-mensual}">
+            <div class="tarjeta">
+                <div class="num">Funcionalidad 3</div>
+                <h2 style="margin-top:6px">Fichero del mes</h2>
+                <p class="ayuda">Concilia el extracto de cobros y descarga el Excel de resultados.</p>
+            </div>
+        </a>
+        <a th:href="@{/rentas/alta}">
+            <div class="tarjeta">
+                <div class="num">Funcionalidad 4</div>
+                <h2 style="margin-top:6px">Insertar renta del mes</h2>
+                <p class="ayuda">Alta manual del importe y la fecha de la renta de un contrato.</p>
+            </div>
+        </a>
+        <a th:href="@{/informes}">
+            <div class="tarjeta">
+                <div class="num">Funcionalidades 5 y 6</div>
+                <h2 style="margin-top:6px">Informes</h2>
+                <p class="ayuda">Excel mensual y Excel anual con los doce meses por inmueble.</p>
+            </div>
+        </a>
+    </div>
+</main>
+</body>
+</html>
