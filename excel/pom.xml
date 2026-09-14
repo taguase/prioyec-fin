@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.gestion.alquileres</groupId>
+    <artifactId>gestion-alquileres-parent</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <artifactId>excel</artifactId>
+  <packaging>jar</packaging>
+  <name>gestion-alquileres :: excel</name>
+  <description>Lectura y escritura de ficheros Excel (Apache POI): cargas e informes</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.gestion.alquileres</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
